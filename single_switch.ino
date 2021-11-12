@@ -8,8 +8,14 @@
 #define MQTT_PASSWORD "YOUR_MQTT_PASSWORD"
 #define PIN_1 1
 #define PIN_2 2
+#define RELAY_ON 1 // normaly closed: 0, normaly open: 1
 
 /*****************  END USER CONFIG SECTION *********************************/
+#if RELAY_ON == 0
+#define RELAY_OFF 1
+#elif RELAY_ON == 1
+#define RELAY_OFF 0
+#endif
 
 EthernetClient ethClient;
 PubSubClient client(ethClient);
@@ -23,6 +29,8 @@ const int mqtt_port = MQTT_PORT;
 const char *mqtt_user = MQTT_USERNAME;
 const char *mqtt_pass = MQTT_PASSWORD;
 const int pin_1 = PIN_1;
+const int relay_on = RELAY_ON;
+const int relay_off = RELAY_OFF;
 
 void reconnect()
 {
@@ -73,12 +81,12 @@ void callback(char *topic, byte *payload, unsigned int length)
         if (newPayload == "ON")
         {
             client.publish("homeassistant/switch/1/state", "ON");
-            digitalWrite(pin_1, HIGH);
+            digitalWrite(pin_1, relay_on);
         }
         else if (newPayload == "OFF")
         {
             client.publish("homeassistant/switch/1/state", "OFF");
-            digitalWrite(pin_1, LOW);
+            digitalWrite(pin_1, relay_off);
         }
     }
 }

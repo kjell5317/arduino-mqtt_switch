@@ -2,14 +2,20 @@
 #include <PubSubClient.h> //https://github.com/knolleary/pubsubclient
 
 /*****************  START USER CONFIG SECTION *********************************/
-#define MQTT_SERVER "YOUR_MQTT_SERVER_ADDRESS"
-#define MQTT_PORT 1883
+#define MQTT_SERVER "10.0.0.1" // IP address of your MQTT broker
+#define MQTT_PORT 1883         // Port of your MQTT broker
 #define MQTT_USERNAME "YOUR_MQTT_USER_NAME"
 #define MQTT_PASSWORD "YOUR_MQTT_PASSWORD"
-#define PIN_1 1
+#define PIN_1 1 // The PINs your relay is connected to
 #define PIN_2 2
+#define RELAY_ON 1 // normaly closed: 0, normaly open: 1
 
 /*****************  END USER CONFIG SECTION *********************************/
+#if RELAY_ON == 0
+#define RELAY_OFF 1
+#elif RELAY_ON == 1
+#define RELAY_OFF 0
+#endif
 
 EthernetClient ethClient;
 PubSubClient client(ethClient);
@@ -24,6 +30,8 @@ const char *mqtt_user = MQTT_USERNAME;
 const char *mqtt_pass = MQTT_PASSWORD;
 const int pin_1 = PIN_1;
 const int pin_2 = PIN_2;
+const int relay_on = RELAY_ON;
+const int relay_off = RELAY_OFF;
 
 void reconnect()
 {
@@ -75,12 +83,12 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (newPayload == "ON")
     {
       client.publish("homeassistant/switch/1/state", "ON");
-      digitalWrite(pin_1, HIGH);
+      digitalWrite(pin_1, relay_on);
     }
     else if (newPayload == "OFF")
     {
       client.publish("homeassistant/switch/1/state", "OFF");
-      digitalWrite(pin_1, LOW);
+      digitalWrite(pin_1, relay_off);
     }
   }
   else if (newTopic == "homeassistant/switch/2")
@@ -88,12 +96,12 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (newPayload == "ON")
     {
       client.publish("homeassistant/switch/2/state", "ON");
-      digitalWrite(pin_1, HIGH);
+      digitalWrite(pin_1, relay_on);
     }
     else if (newPayload == "OFF")
     {
       client.publish("homeassistant/switch/2/state", "OFF");
-      digitalWrite(pin_1, LOW);
+      digitalWrite(pin_1, relay_off);
     }
   }
 }
