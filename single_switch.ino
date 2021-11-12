@@ -70,10 +70,16 @@ void callback(char *topic, byte *payload, unsigned int length)
 
     if (newTopic == "homeassistant/switch/1")
     {
-        client.publish("homeassistant/switch/1/state", charPayload);
-        digitalWrite(pin_1, HIGH);
-        delay(500);
-        digitalWrite(pin_1, LOW);
+        if (newPayload == "ON")
+        {
+            client.publish("homeassistant/switch/1/state", "ON");
+            digitalWrite(pin_1, HIGH);
+        }
+        else if (newPayload == "OFF")
+        {
+            client.publish("homeassistant/switch/1/state", "OFF");
+            digitalWrite(pin_1, LOW);
+        }
     }
 }
 
